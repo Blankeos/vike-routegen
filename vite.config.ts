@@ -5,6 +5,8 @@ import devServer from "@hono/vite-dev-server";
 import vikeSolid from "vike-solid/vite";
 import vike from "vike/plugin";
 
+import vikeRoutegen from "./lib/vike-routegen";
+
 // Vite
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -32,6 +34,7 @@ export default defineConfig({
     }),
     vike({}),
     vikeSolid(),
+    vikeRoutegen(),
   ],
   server: {
     port: 3000,
