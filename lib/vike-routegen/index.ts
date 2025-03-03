@@ -67,7 +67,7 @@ export function getRoute<T extends PageRoute>(
     : [options?: GetRouteOptions<T>]
 ): string {
   const options = args[0];
-  let result = route;
+  let result: string = route;
 
   if (options?.params) {
     Object.entries(options.params).forEach(([key, value]) => {

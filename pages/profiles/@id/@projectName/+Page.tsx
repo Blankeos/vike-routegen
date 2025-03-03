@@ -9,16 +9,7 @@ export default function Page() {
 
   return (
     <>
-      <div>
-        <h1>My Vike + Solid app</h1>
-        This page is:
-        <ul>
-          <li>Rendered to HTML.</li>
-          <li>
-            Interactive. <Counter />
-          </li>
-        </ul>
-      </div>
+      <div>Project ... and projectName ...</div>
     </>
   );
 }

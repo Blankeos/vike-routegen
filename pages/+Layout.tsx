@@ -1,3 +1,4 @@
+import { getRoute } from "@/route-tree.gen";
 import getTitle from "@/utils/get-title";
 import { createSignal, type FlowProps } from "solid-js";
 import { useMetadata } from "vike-metadata-solid";
@@ -12,9 +13,19 @@ export default function RootLayout(props: FlowProps) {
     <>
       <div>
         <nav>
-          <a href="/">Home</a>
+          <a href={getRoute("/")}>Home</a>
           <span>{" | "}</span>
-          <a href="/dashboard">Dashboard</a>
+          <a href={getRoute("/dashboard")}>Dashboard</a>
+          <span>{" | "}</span>
+          <a href={getRoute("/profiles/@id", { params: { id: "carlo" } })}>Profiles carlo</a>
+          <span>{" | "}</span>
+          <a
+            href={getRoute("/profiles/@id/@projectName", {
+              params: { id: "carlo", projectName: "proj" },
+            })}
+          >
+            PRofilesandProjectname
+          </a>
           <span>{" | "}</span>
           <Counter />
         </nav>
