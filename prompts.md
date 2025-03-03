@@ -67,3 +67,45 @@ If it doesn't have any route params, don't require it (i.e. make it undefined)
 getRoute should error if the second arg is not passed when the route passed requires a route param. i.e. getRoute("/profiles/@id") // It should error here.
 
 But getRoute should also not error fi the second arg is not set, if the route passed does not require a route param. i.e. `getRoute("/dashboard").
+
+5th prompt:
+
+```
+I need an improvement for `getRoute()`.
+
+Now, I want `getRoute("", opts).
+
+opts will now be:
+- params: // what used to be the second argument. Same type still with the same rules. If required, it should require, if not, no need.
+- search: // For now, just always a Record<string, string>.
+```
+
+6th prompt:
+
+```
+The `params` property in getRouteOptions, should be required if we detect that a specific route needs it.
+
+e.g.
+getRoute("/profile/@id") // Should error, and say that { params: { } } is required.
+
+getRoute("/profile/@id", { }) // Should error, say that params is required.
+
+getRoute("/dashboard") // No errors.
+
+Is this possible?
+
+```
+
+7th prompt:
+
+```
+Currently:
+
+getRoute("/profile/@id") // Has no error. that second arg is required. IT should have na error.
+
+getRoute("/profile/@id", { }) // Has an error, that params is required. This is good.
+
+getRoute("/dashboard") // Has no error, that second arg is required. This is good.
+
+If a param is detected, can we make the second arg required, but if not, we just make the second arg optional?
+```

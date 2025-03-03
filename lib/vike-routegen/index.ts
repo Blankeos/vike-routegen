@@ -48,16 +48,38 @@ type ExtractRouteParams<T extends string> = T extends \`\${string}@\${infer Para
 
 export type VikeRouteParams<T extends PageRoute> = ExtractRouteParams<T>;
 
+type HasParams<T extends string> = T extends \`\${string}@\${string}\` ? true : false;
+
+type GetRouteOptions<T extends PageRoute> = HasParams<T> extends true
+  ? {
+      params: ExtractRouteParams<T>;
+      search?: Record<string, string>;
+    }
+  : {
+      params?: ExtractRouteParams<T>;
+      search?: Record<string, string>;
+    };
+
 export function getRoute<T extends PageRoute>(
   route: T,
-  ...args: ExtractRouteParams<T> extends Record<string, never> ? [] : [ExtractRouteParams<T>]
+  ...args: HasParams<T> extends true
+    ? [options: GetRouteOptions<T>]
+    : [options?: GetRouteOptions<T>]
 ): string {
-  const [params] = args;
-  if (!params) return route;
+  const options = args[0];
   let result = route;
-  Object.entries(params || {}).forEach(([key, value]) => {
-    result = result.replace(\`@\${key}\`, String(value));
-  });
+
+  if (options?.params) {
+    Object.entries(options.params).forEach(([key, value]) => {
+      result = result.replace(\`@\${key}\`, String(value));
+    });
+  }
+
+  if (options?.search) {
+    const searchParams = new URLSearchParams(options.search);
+    result += \`?\${searchParams.toString()}\`;
+  }
+
   return result;
 }`;
 
