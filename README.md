@@ -1,52 +1,52 @@
-# 🐇 Solid Hop
+## Vike-Routegen (An experiment)
 
-💙 A **minimal** and **unopinionated** Vike + Solid + Hono starter.
+This experiment aims to replicate the DX that TanStack Start/Router has for Typesafe Routes, but in Vike, with just the current
+features that Vike core and Vike-\* framework extensions have.
 
-❤️ We love Vike and Solid, but it might be overwhelming to setup. The goal of this starter is to get you up and running quickly with good defaults without getting in the way of your opinions.
+![Overview of Vike-Routegen](./_docs/overview.png)
 
-This is more or less what you would get from a starter with `create next-app` or `create svelte` or `create solid`.
+### How it works
 
-If you want a more opinionated and fully-featured boilerplate instead: http://github.com/blankeos/solid-launch
+- A vite `build` script runs every time a change is made during `vite` development. it creates `route-tree.gen.ts`.
+- You get: `getRoute()` and `useParams()` as well.
 
-## Tech Stack:
+I'm still figuring out how this can be more agnostic for `vike-react`, `vike-solid`, and `vike-vue` + maybe be part of `vike`.
 
-1. Vike + Hono - For SSR + Your own Server.
-2. SolidJS
-3. Bun (Can swap this with Node easily if you want).
-4. Tools: ESLint, Prettier
+**Currently achieved:**
 
-## Quick Start
+- [x] Type-gen for route definitions.
 
-1. Clone
+  - [x] Regular routes (e.g. `/`, `/dashboard`)
+  - [x] Nested routes (e.g. `/dashboard/profile`)
+  - [x] Dynamic Routes (e.g. `/blog/@slug`)
+  - [x] Catch-all or Splat routes (e.g. `/blog/@`) - [TanStack](https://tanstack.com/router/latest/docs/framework/react/routing/routing-concepts#splat--catch-all-routes) uses `$` like [Remix](https://remix.run/docs/en/main/file-conventions/routes#splat-routes) for splat routes.
+  - [ ] TODO: Missed use-case, I'll have to check this: `/blog/@slug/@`. Output should be something like `{ slug: "123", @: ["123", "123", "123"] }`
 
-```sh
-git clone https://github.com/blankeos/solid-hop <your-app-name>
-cd <your-app-name>
-rm -rf .git # This is your app. Start the commits fresh :D
-```
+- [x] Typesafe Route Navigation. `getRoute()`
+- [x] Typesafe Route Param consumption. `useParams()`
+- [ ] Typesafe Search Param consumption - `useSearch()` - Unachieveable currently without a core change in Vike (I think).
 
-1. Install
+## APIs
 
-```sh
-bun install
-```
+### getRoute
 
-3. Run dev server
+The `getRoute()` function provides fully type-safe navigation for your routes.
 
-```sh
-bun dev
-```
+I decided to implement a "utility" instead of a separate `<Link />`, `navigate()` utility. Because you can still use it like:
+`<a href={getRoute("...")}>` or `navigate(getRoute("..."))`, with the same DX. Plus, still be able to opt out for more flexible usecases that the typesafety doesn't support.
 
-## Building and Deployment
+![getRoute with autocompletion](./_docs/getroute-1.png)
 
-1. Build
+Tells you if a route needs parameters.
 
-```sh
-bun run build
-```
+![getRoute with path parameter type checking](./_docs/getroute-2.png)
 
-2. Wherever you deploy, just run make sure that this is ran:
+Tells you which parameters to put into a route.
 
-```sh
-bun run preview # Just runs server.ts
-```
+![](./_docs/getroute-3.png)
+
+### useParams()
+
+The `useParams()` hook gives you type-safe access to route parameters:
+
+![useParams with type safety](./_docs/useParams-1.png)
