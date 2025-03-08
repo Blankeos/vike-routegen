@@ -109,3 +109,39 @@ getRoute("/dashboard") // Has no error, that second arg is required. This is goo
 
 If a param is detected, can we make the second arg required, but if not, we just make the second arg optional?
 ```
+
+8th Prompt - to add splat routes
+
+Now I also want to be able to parse "catchall" routes.
+
+"catchall" routes in Vike look like:
+
+pages/<any-page>/
++route.ts
++Page.tsx
+
+When you have a +route.ts and its contents are:
+export default "/<any-page>/\*";
+
+Then that's a catchall or a splat route.
+
+For example:
+pages/profiles/
++route.ts
++Page.tsx
+
+And the content is:
+export default "/profiles/\*";
+
+We have a catchall route.
+
+Can we maybe represent it as "/profiles/@" when added to const pageRoutes??
+
+So it indicates as a catchall route?
+
+Then, if it satisfies as a catchall route, we want the `getRoute()` function's
+param to accept an array like so:
+
+getRoute("/profiles/@", { params: ["user1", "user2"] }) which will turn into /profiles/user1/user2
+
+I want this type actually to apply for ExtractRouteParams later so I can use it for a custom hook called `useParams(): string[]` whenever it's a catchall route but an object when it isn't.

@@ -1,15 +1,23 @@
+import { useParams } from "@/lib/use-params";
 import getTitle from "@/utils/get-title";
 import { createSignal } from "solid-js";
 import { useMetadata } from "vike-metadata-solid";
 
 export default function Page() {
   useMetadata({
-    title: getTitle("Profile"),
+    title: getTitle("Profile with Project"),
+  });
+
+  const routeParams = useParams({
+    from: "/profiles/@id/@projectName",
   });
 
   return (
     <>
-      <div>Project ... and projectName ...</div>
+      <div>
+        <h1>/profiles</h1>
+        <div>({JSON.stringify(routeParams)})</div>
+      </div>
     </>
   );
 }

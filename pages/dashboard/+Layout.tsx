@@ -1,27 +1,17 @@
 import { getRoute } from "@/route-tree.gen";
-import { createSignal, type FlowProps } from "solid-js";
+import { type FlowProps } from "solid-js";
 
 export default function DashboardLayout(props: FlowProps) {
   return (
     <div>
+      <br />
       <aside>
-        <a href={getRoute("/dashboard")}>Dashboard</a>
+        <a href={getRoute("/dashboard")}>/dashboard</a>
         <span>{" | "}</span>
-        <a href={getRoute("/dashboard/settings")}>Settings</a>
+        <a href={getRoute("/dashboard/settings")}>/settings</a>
         <span>{" | "}</span>
-        <Counter />
       </aside>
       {props.children}
     </div>
-  );
-}
-
-function Counter() {
-  const [count, setCount] = createSignal(0);
-
-  return (
-    <button type="button" onClick={() => setCount((count) => count + 1)}>
-      Dashboard Counter {count()}
-    </button>
   );
 }

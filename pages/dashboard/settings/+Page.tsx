@@ -3,14 +3,13 @@ import { useMetadata } from "vike-metadata-solid";
 
 export default function Page() {
   useMetadata({
-    title: getTitle("Home"),
+    title: getTitle("Settings"),
   });
 
   return (
     <>
       <div>
-        <h1>This is the /dashboard/settings</h1>
-        <p>Demonstrating nested layout.</p>
+        <h1>/settings</h1>
       </div>
     </>
   );

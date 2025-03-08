@@ -1,6 +1,6 @@
 import { getRoute } from "@/route-tree.gen";
 import getTitle from "@/utils/get-title";
-import { createSignal, type FlowProps } from "solid-js";
+import { type FlowProps } from "solid-js";
 import { useMetadata } from "vike-metadata-solid";
 
 useMetadata.setGlobalDefaults({
@@ -13,34 +13,31 @@ export default function RootLayout(props: FlowProps) {
     <>
       <div>
         <nav>
-          <a href={getRoute("/")}>Home</a>
+          <a href={getRoute("/")}>/home</a>
           <span>{" | "}</span>
-          <a href={getRoute("/dashboard")}>Dashboard</a>
+          <a href={getRoute("/dashboard")}>/dashboard</a>
           <span>{" | "}</span>
-          <a href={getRoute("/profiles/@id", { params: { id: "carlo" } })}>Profiles carlo</a>
+          <a href={getRoute("/profiles/@id", { params: { id: "carlo" } })}>/profiles/@id</a>
           <span>{" | "}</span>
           <a
             href={getRoute("/profiles/@id/@projectName", {
               params: { id: "carlo", projectName: "proj" },
             })}
           >
-            PRofilesandProjectname
+            /profiles/@id/@projectName
           </a>
           <span>{" | "}</span>
-          <Counter />
+          <a
+            href={getRoute("/catchall/@", {
+              params: ["123", "456", "789"],
+            })}
+          >
+            /catchall/@
+          </a>
+          <span>{" | "}</span>
         </nav>
         {props.children}
       </div>
     </>
-  );
-}
-
-function Counter() {
-  const [count, setCount] = createSignal(0);
-
-  return (
-    <button type="button" onClick={() => setCount((count) => count + 1)}>
-      Root Counter {count()}
-    </button>
   );
 }
