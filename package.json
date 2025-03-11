@@ -2,7 +2,7 @@
   "name": "@blankeos/vike-routegen",
   "private": false,
   "description": "Typesafe routes in Vike just like in TanStack Router. Just a vite extension.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Carlo Taleon",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

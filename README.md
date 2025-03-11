@@ -1,5 +1,7 @@
 # Vike Routegen
 
+![banner](_docs/banner.png)
+
 A typesafe routing utility for [Vike](https://vike.dev) applications. Inspired by TanStack Start.
 
 Forewarned, this is more like a temporary. For me, it's currently a feature-complete solution and I'll be using it for my projects. That's why it's published under a scoped package name.
