@@ -64,7 +64,7 @@ const searchUrl = getRoute("/search", {
 const docsUrl = getRoute("/docs/@", {
   params: { "@": ["guide", "getting-started"] },
 });
-// Result: "/docs/guide/getting-started"
+// 👉 Result: "/docs/guide/getting-started"
 ```
 
 #### `useParams()`
