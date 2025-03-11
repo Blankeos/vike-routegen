@@ -3,6 +3,9 @@ import path from "path";
 import { Plugin } from "vite";
 import { createRoutegenFileContent } from "./utils";
 
+import { getVikeConfig } from "vike/plugin";
+import { getGlobalContextAsync } from "vike/server";
+
 type VikeRouteGenOptions = {
   /** Used for generating the `useParams` hook.
    * - Defaults to 'vike-react/usePageContext' or 'vike-solid/usePageContext' or 'vike-vue/usePageContext' (Based on package.json)
@@ -21,88 +24,32 @@ export default async function vikeRoutegen(
 ): Promise<Plugin> {
   // Declare variables that will be set in configResolved and used in other hooks
   let projectRoot: string;
-  let pagesDir: string;
   let outputFilePath: string;
   let usePageContextImportSource: string = "";
+  let uniqueRoutes: string[] = [];
 
-  // Helper functions
-  async function checkIsCatchallRoute(dirPath: string): Promise<boolean> {
-    try {
-      // Check for +route.ts
-      let routeFilePath = path.join(dirPath, "+route.ts");
-      let fileExists = await fs
-        .access(routeFilePath)
-        .then(() => true)
-        .catch(() => false);
+  // Function to extract unique routes from pages object
+  function extractUniqueRoutes(pages: Record<string, any>): string[] {
+    if (!pages) return [];
 
-      // If +route.ts doesn't exist, check for route.js
-      if (!fileExists) {
-        routeFilePath = path.join(dirPath, "route.js");
-        fileExists = await fs
-          .access(routeFilePath)
-          .then(() => true)
-          .catch(() => false);
-      }
-
-      if (!fileExists) return false;
-
-      const content = await fs.readFile(routeFilePath, "utf-8");
-      return content.includes('/*"') || content.includes('/* "');
-    } catch (_error) {
-      return false;
-    }
-  }
-
-  async function getValidRoutes(
-    dir: string,
-    baseRoute: string = "",
-  ): Promise<string[]> {
     const routes: string[] = [];
-    const files = await fs.readdir(dir, { withFileTypes: true });
+    Object.values(pages).forEach((pageValue: any) => {
+      const route: string | undefined = pageValue.route as string;
+      if (!route) return;
 
-    // Check if the current directory is a catchall route
-    const isCatchallRoute = await checkIsCatchallRoute(dir);
-
-    for (const file of files) {
-      const fullPath = path.join(dir, file.name);
-
-      if (
-        file.isDirectory() &&
-        !file.name.startsWith("(") &&
-        file.name !== "_error"
-      ) {
-        // Handle directories
-        if (file.name === "index") {
-          routes.push(...(await getValidRoutes(fullPath, baseRoute)));
-        } else {
-          routes.push(
-            ...(await getValidRoutes(
-              fullPath,
-              path.join(baseRoute, file.name),
-            )),
-          );
-        }
-      } else if (file.name === "+Page.tsx" || file.name === "+Page.vue") {
-        // Handle +Page.tsx or +Page.vue files
-        // Always add leading slash for routes
-        const routePath = baseRoute === "" ? "/" : `/${baseRoute}`;
-
-        // Add as catchall route if needed
-        if (isCatchallRoute) {
-          routes.push(`${routePath}/@`);
-        } else {
-          routes.push(routePath);
-        }
+      if (route.endsWith("/*")) {
+        routes.push(route.replace("*", "@"));
+        return;
       }
-    }
 
-    return routes;
+      routes.push(route);
+    });
+
+    return [...new Set(routes)].sort();
   }
 
   async function generatePagesList() {
     try {
-      const routes = await getValidRoutes(pagesDir);
-      const uniqueRoutes = [...new Set(routes)].sort();
       const content = createRoutegenFileContent({
         uniqueRoutes,
         usePageContextImportSource,
@@ -117,77 +64,27 @@ export default async function vikeRoutegen(
     }
   }
 
+  // Function to update routes from global context and regenerate if changed
+  async function updateRoutesFromGlobalContext() {
+    try {
+      const globalContext = await getGlobalContextAsync(false);
+      const refreshedRoutes = extractUniqueRoutes(globalContext.pages || {});
+
+      // Only update and regenerate if routes have changed
+      if (JSON.stringify(refreshedRoutes) !== JSON.stringify(uniqueRoutes)) {
+        uniqueRoutes = refreshedRoutes;
+        await generatePagesList();
+      }
+    } catch (error) {
+      console.error("Error updating routes from global context:", error);
+    }
+  }
+
   return {
     name: "vike-routegen",
     async configResolved(config) {
       // Store the project root for use in other hooks
       projectRoot = config.root;
-
-      // Find pages directory
-      const srcPagesPath = path.join(projectRoot, "src", "pages");
-      const rootPagesPath = path.join(projectRoot, "pages");
-
-      if (
-        await fs
-          .access(srcPagesPath)
-          .then(() => true)
-          .catch(() => false)
-      ) {
-        pagesDir = srcPagesPath;
-      } else if (
-        await fs
-          .access(rootPagesPath)
-          .then(() => true)
-          .catch(() => false)
-      ) {
-        pagesDir = rootPagesPath;
-      } else {
-        // Try to find a pages directory recursively (limited to reasonable depth)
-        async function findPagesDir(
-          dir: string,
-          depth = 0,
-        ): Promise<string | null> {
-          if (depth > 3) return null; // Avoid searching too deep
-
-          try {
-            const entries = await fs.readdir(dir, { withFileTypes: true });
-
-            // Check if this directory contains a pages directory
-            const pagesEntry = entries.find(
-              (entry) => entry.isDirectory() && entry.name === "pages",
-            );
-
-            if (pagesEntry) {
-              return path.join(dir, "pages");
-            }
-
-            // Search subdirectories
-            for (const entry of entries) {
-              if (entry.isDirectory()) {
-                const result = await findPagesDir(
-                  path.join(dir, entry.name),
-                  depth + 1,
-                );
-                if (result) return result;
-              }
-            }
-          } catch {
-            // Skip inaccessible directories
-          }
-
-          return null;
-        }
-
-        const foundPagesDir = await findPagesDir(projectRoot);
-        if (!foundPagesDir) {
-          console.warn(
-            "[vike][routegen] No pages directory found. Using default path 'pages'",
-          );
-          pagesDir = path.join(projectRoot, "pages");
-        } else {
-          pagesDir = foundPagesDir;
-        }
-      }
 
       // Determine the output file path
       const hasSrcDir = await fs
@@ -203,6 +100,7 @@ export default async function vikeRoutegen(
         ? path.resolve(projectRoot, options.outputPath)
         : defaultOutputFilePath;
 
+      // 🧹 The framework detection could be improved or moved to a separate function
       // Check config plugins to detect framework
       if (
         options?.usePageContextImportSource !== undefined ||
@@ -240,24 +138,29 @@ export default async function vikeRoutegen(
         }
       }
 
-      // Initial route generation
-      // await generatePagesList();
+      // Initial route generation using global context
+      try {
+        const vikeConfig = getVikeConfig(config);
+        uniqueRoutes = extractUniqueRoutes(vikeConfig.pages || {});
+      } catch (error) {
+        console.warn("[vike][routegen] Could not get initial routes:", error);
+        uniqueRoutes = [];
+      }
     },
 
     async buildStart() {
-      // We can now call generatePagesList here since it uses variables set in configResolved
+      // Generate routes at build time
       await generatePagesList();
     },
 
     async handleHotUpdate({ file }) {
-      if (
-        pagesDir &&
-        file.startsWith(pagesDir) &&
-        !file.endsWith("route-tree.gen.ts")
-      ) {
-        // We can now regenerate routes when files change
-        await generatePagesList();
+      // Don't regenerate if we're editing the generated file itself
+      if (path.resolve(file) === outputFilePath) {
+        return;
       }
+
+      // Update routes from global context when files change
+      await updateRoutesFromGlobalContext();
     },
   };
 }

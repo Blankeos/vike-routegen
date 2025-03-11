@@ -41,7 +41,7 @@
   ],
   "license": "MIT",
   "scripts": {
-    "dev": "bunx --bun vite serve dev",
+    "dev": "vite serve dev",
     "test": "bun test; bunx playwright test;",
     "build": "tsup",
     "build:site": "vite build dev",

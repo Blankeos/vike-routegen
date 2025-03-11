@@ -20,12 +20,20 @@ const pageRoutes = ${JSON.stringify(uniqueRoutes, null, 2)} as const;
 
 type PageRoute = typeof pageRoutes[number];
 
-/* For regular routes with named parameters */
-type ExtractNamedParams<T extends string> = T extends \`\${string}@\${infer Param}/\${infer Rest}\`
+/* For regular routes with named parameters. But it has a minor issue, it gets "" as a property, so this is prefixed with '_' */
+type _ExtractNamedParams<T extends string> = T extends \`\${string}@\${infer Param}/\${infer Rest}\`
 ? { [K in Param | keyof ExtractNamedParams<Rest>]: string }
 : T extends \`\${string}@\${infer Param}\`
 ? { [K in Param]: string }
 : {};
+
+/** Minor utility to prevent typescript from wrapping types. */
+type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
+/* For regular routes with named parameters */
+type ExtractNamedParams<T extends string> = Prettify<Omit<_ExtractNamedParams<T>, "">>;
 
 /* Helper to determine if a route ends with a catch-all segment */
 type EndsWithCatchall<T extends string> = T extends \`\${string}/@\` ? true : false;
@@ -51,7 +59,7 @@ IsCatchallRoute<T> extends true
 type GetRouteOptions<T extends PageRoute> = HasParams<T> extends true
 ? IsCatchallRoute<T> extends true
 ? {
-params: Omit<ExtractNamedParams<T>, ""> & { '@': string[] | string };
+params: ExtractNamedParams<T> & { '@': string[] | string };
 search?: Record<string, string>;
 }
 : {

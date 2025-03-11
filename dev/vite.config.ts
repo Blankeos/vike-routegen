@@ -15,11 +15,7 @@ const __dirname = dirname(__filename);
 const root = resolve(__dirname, ".");
 
 export default defineConfig({
-  plugins: [
-    vike({}),
-    vikeSolid(),
-    vikeRoutegen({ usePageContextImportSource: false }),
-  ],
+  plugins: [vike({}), vikeSolid(), vikeRoutegen()],
   server: {
     port: 3000,
   },
