@@ -2,8 +2,10 @@
 
 A typesafe routing utility for [Vike](https://vike.dev) applications. Inspired by TanStack Start.
 
-Forewarned, it's more like a temporary, but feature-complete solution for me, since [Vike is planning to make this a built-in feature](https://github.com/vikejs/vike/issues/698).
-That's why it's published under a scoped package name.
+Forewarned, this is more like a temporary. For me, it's currently a feature-complete solution and I'll be using it for my projects. That's why it's published under a scoped package name.
+
+But this also serves as an experiment for adding this into Vike's core.
+[Vike is planning to make this a built-in feature](https://github.com/vikejs/vike/issues/698).
 
 ## Installation
 
@@ -22,7 +24,7 @@ export default defineConfig({
   plugins: [
     // ...
     vike(),
-    vikeRoutegen({}), // Has sensible defaults + automatic detection (solid/react/vue), so it can be zero-config.
+    vikeRoutegen(), // Has sensible defaults + automatic detection (solid/react/vue), so it can be zero-config.
   ],
 });
 ```

@@ -11,5 +11,6 @@ export default defineConfig([
     sourcemap: true,
     clean: true,
     minify: true,
+    external: ["vike", "vite", "vike/plugin", "vike/server"],
   },
 ]);
