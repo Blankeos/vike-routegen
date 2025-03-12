@@ -12,7 +12,7 @@ But this also serves as an experiment for adding this into Vike's core.
 ## Installation
 
 ```bash
-npm install @blankeos/vike-routegen
+npm install -D @blankeos/vike-routegen
 ```
 
 Add the plugin to your Vite config:
