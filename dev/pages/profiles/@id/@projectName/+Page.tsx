@@ -16,7 +16,7 @@ export default function Page() {
     <>
       <div>
         <h1>/profiles</h1>
-        <div>({JSON.stringify(routeParams)})</div>
+        <div>({JSON.stringify(routeParams())})</div>
       </div>
     </>
   );

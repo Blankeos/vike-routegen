@@ -87,6 +87,15 @@ function BlogPost() {
 }
 ```
 
+> ![NOTE]
+> There are gotchas with SolidJS for reactivity to work with useParams.
+> Make sure to not "destructure" the result. Also write the code like:
+>
+> ```tsx
+> const routeParams = useParams({ from: "/docs/@" });
+> routeParams().id; // It's an accessor.
+> ```
+
 ## Optional Configuration
 
 This is designed to work out-of-the-box with Vike and the
@@ -107,3 +116,8 @@ vikeRoutegen({
 
 Set `usePageContextImportSource` to `false` to disable the `useParams` utility. If you're not using
 one of the standard vike extensions (vike-react, vike-solid, vike-vue).
+
+BUGS I NOTICED:
+
+- Catch all when it's on pages/@ (so something like pages/all/+route.ts = export default '\*'), it doesn't work.
+- The `from` in useParams should be completely independent from what is being generated.

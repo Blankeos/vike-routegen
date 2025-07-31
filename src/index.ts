@@ -27,6 +27,7 @@ export default async function vikeRoutegen(
   let outputFilePath: string;
   let usePageContextImportSource: string = "";
   let uniqueRoutes: string[] = [];
+  let jsFramework: "solid" | "react" | "vue" = "react";
 
   // Function to extract unique routes from pages object
   function extractUniqueRoutes(pages: Record<string, any>): string[] {
@@ -53,6 +54,7 @@ export default async function vikeRoutegen(
       const content = createRoutegenFileContent({
         uniqueRoutes,
         usePageContextImportSource,
+        jsFramework,
       });
 
       await fs.writeFile(outputFilePath, content);
@@ -113,23 +115,29 @@ export default async function vikeRoutegen(
               : "",
           );
 
-          const hasReactPlugin = pluginNames.some((name) =>
-            name.toLowerCase().includes("react"),
-          );
-          const hasSolidPlugin = pluginNames.some((name) =>
-            name.toLowerCase().includes("solid"),
-          );
-          const hasVuePlugin = pluginNames.some((name) =>
-            name.toLowerCase().includes("vue"),
-          );
+          let detectedVikeFrameworkPlugin = false;
 
-          if (hasReactPlugin) {
+          if (
+            pluginNames.some((name) => name.toLowerCase().includes("react"))
+          ) {
+            jsFramework = "react";
             usePageContextImportSource = "vike-react/usePageContext";
-          } else if (hasSolidPlugin) {
+            detectedVikeFrameworkPlugin = true;
+          } else if (
+            pluginNames.some((name) => name.toLowerCase().includes("solid"))
+          ) {
+            jsFramework = "solid";
             usePageContextImportSource = "vike-solid/usePageContext";
-          } else if (hasVuePlugin) {
+            detectedVikeFrameworkPlugin = true;
+          } else if (
+            pluginNames.some((name) => name.toLowerCase().includes("vue"))
+          ) {
+            jsFramework = "vue";
             usePageContextImportSource = "vike-vue/usePageContext";
-          } else {
+            detectedVikeFrameworkPlugin = true;
+          }
+
+          if (!detectedVikeFrameworkPlugin) {
             usePageContextImportSource = "";
           }
         } else {
