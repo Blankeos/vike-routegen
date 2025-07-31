@@ -1,8 +1,15 @@
 export function createRoutegenFileContent(options: {
   usePageContextImportSource?: string | false;
   uniqueRoutes: string[];
+  jsFramework: "solid" | "react" | "vue";
 }) {
   const { usePageContextImportSource, uniqueRoutes } = options;
+
+  const useParamsReturnType =
+    options.jsFramework === "solid"
+      ? "() => UseParamsResult<T>"
+      : "UseParamsResult<T>";
+
   return `// /* eslint-disable */
 // @ts-nocheck
 
@@ -120,8 +127,11 @@ return result;
 ${
   usePageContextImportSource
     ? `import { usePageContext } from '${usePageContextImportSource}'
-function useParams<T extends PageRoute>(params: { from: T }): UseParamsResult<T> {
+${options.jsFramework === "solid" ? "import { createMemo } from 'solid-js'" : ""}
+function useParams<T extends PageRoute>(params: { from: T }): ${useParamsReturnType} {
 const pageContext = usePageContext();
+
+${options.jsFramework === "solid" ? "return createMemo(() => {" : ""}
 const routeParams = pageContext.routeParams as Record<string, string>;
 
 // Check if this is a catch-all route
@@ -152,6 +162,7 @@ return {
 
 // Handle regular dynamic routes without catch-all
 return routeParams as UseParamsResult<T>;
+${options.jsFramework === "solid" ? "});" : ""}
 }`
     : ""
 }`;
