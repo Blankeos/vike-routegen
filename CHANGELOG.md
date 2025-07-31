@@ -1,5 +1,11 @@
 # @blankeos/vike-routegen
 
+## 0.0.3
+
+### Patch Changes
+
+- ebfec98: fix: solidjs now works reactively in the same route.
+
 ## 0.0.2
 
 ### Patch Changes
