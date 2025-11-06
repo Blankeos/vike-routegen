@@ -9,6 +9,13 @@ Forewarned, this is more like a temporary. For me, it's currently a feature-comp
 But this also serves as an experiment for adding this into Vike's core.
 [Vike is planning to make this a built-in feature](https://github.com/vikejs/vike/issues/698).
 
+## Why Vike-Routegen?
+
+- ✨ **Zero dependencies.** a thin, transparent layer.
+- 🔗 **Typesafe links _anywhere_.** arrays, hrefs, matching, whatever you need.
+- 💡 **Won’t hide or wrap your `<a>` components.** thinly layered on your app without breaking existing types.
+- ⚡ **Fully code-generated.** for maximum type safety and zero runtime overhead, will still work in case of breaking changes.
+
 ## Installation
 
 ```bash
@@ -78,7 +85,9 @@ function BlogPost() {
   // For routes like /blog/@slug
   const { slug } = useParams({ from: '/blog/@slug' }) // 📝 Quick tip: Avoid destructuring like this in SolidJS.
 
-  // For catch-all routes like /docs/@
+  // For catch-all routes like /docs/@ (e.g. /docs/a/b)
+  // segments is ['a', 'b']
+  // fullPath is '/a/b'
   const { '@': segments, '_@': fullPath } = useParams({ from: '/docs/@' }) // 📝 Quick tip: Avoid destructuring like this in SolidJS.
 
   return (

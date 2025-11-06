@@ -15,7 +15,15 @@ export default function Page() {
     <div>
       <h1>/catchall</h1>
       <p>This is a demonstration of "catchall" or "splat" routes.</p>
-      <div>{JSON.stringify(routeParams)}</div>
+      <div>{JSON.stringify(routeParams())}</div>
+      <ul>
+        <li>
+          <a href="/catchall/a">/catchall/a</a>
+        </li>
+        <li>
+          <a href="/catchall/b/c">/catchall/b/c</a>
+        </li>
+      </ul>
     </div>
   );
 }
